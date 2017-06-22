@@ -2,6 +2,6 @@
 {
     public interface IProperty_Single_String
     {
-        string Test { get; set; }
+        string TestS { get; set; }
     }
 }

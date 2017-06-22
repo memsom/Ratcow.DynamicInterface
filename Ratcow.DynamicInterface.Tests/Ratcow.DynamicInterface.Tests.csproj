@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
     <Compile Include="IBasic.cs" />
+    <Compile Include="IProperty_Double_StringInt32.cs" />
     <Compile Include="IProperty_Single_Int32.cs" />
     <Compile Include="IProperty_Single_String.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

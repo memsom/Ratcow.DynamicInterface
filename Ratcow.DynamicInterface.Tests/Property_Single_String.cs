@@ -2,7 +2,7 @@
 {
     public class Property_Single_String
     {
-        [PropertyImplementation(Interface = typeof(IProperty_Single_String), Name = "Test")]
+        [PropertyImplementation(Interface = typeof(IProperty_Single_String), Name = "TestS")]
         public string Test { get; set; }
     }
 }
