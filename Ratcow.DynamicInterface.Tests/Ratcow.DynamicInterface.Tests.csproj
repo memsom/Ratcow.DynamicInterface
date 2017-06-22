@@ -48,9 +48,15 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseTest.cs" />
     <Compile Include="IBasic.cs" />
+    <Compile Include="IProperty_Single_Int32.cs" />
+    <Compile Include="IProperty_Single_String.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AttributedMapper_BasicTests.cs" />
+    <Compile Include="AttributedMapper_PropertyTests.cs" />
+    <Compile Include="Property_Single_Int32.cs" />
+    <Compile Include="Property_Single_String.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
