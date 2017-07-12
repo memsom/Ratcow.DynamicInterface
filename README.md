@@ -1,6 +1,8 @@
 # DynamicInterface
 A library to dynamically glue an interface to one or more classes, creating a new dynamic type.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/89cp5f6n46huom4v/branch/master?svg=true)](https://ci.appveyor.com/project/memsom/dynamicinterface/branch/master)
+
 The initial version is pretty basic, but functional. 
 
 ## How it works
