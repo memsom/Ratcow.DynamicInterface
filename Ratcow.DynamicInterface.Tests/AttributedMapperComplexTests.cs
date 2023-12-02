@@ -18,8 +18,14 @@ public class AttributedMapperComplexTests: BaseTest
 
         // currently fails as I think it generates the wrong IL
 
-        //var resultant = engine.CreateType<IComplexExample>(instance);
+        var resultant = engine.CreateInstance<IComplexExample>(instance);
 
-       // VerifyType_Single_Instance(resultant, nameof(ComplexExample), typeof(ComplexExample));
+        Assert.IsNotNull(resultant);
+
+        resultant.Simple0();
+        resultant.Simple1(10);
+
+
+        // VerifyType_Single_Instance(resultant, nameof(ComplexExample), typeof(ComplexExample));
     }
 }

@@ -188,13 +188,13 @@ public abstract class V1Mapper : BaseMapper
     /// <summary>
     ///
     /// </summary>
-    void AddMethod_value_noparams(TypeBuilder dynamicType, MethodInfo methodInfo, (string Name, string ImplementorName, object Implementor) instance, FieldBuilder field,
+    void AddMethod_value_noparams(
+        TypeBuilder dynamicType,
+        MethodInfo methodInfo,
+        (string Name, string ImplementorName, object Implementor) instance,
+        FieldBuilder field,
         ParameterInfo returnInfo)
     {
-        //IL_0001: ldarg.0
-        //IL_0002: ldfld class ModelTestImpl.SimpleMethodTest ModelTestImpl.SimpleMethodTestImpl::simplemethodtest
-        //IL_0007: callvirt instance int32 ModelTestImpl.SimpleMethodTest::GetInt()
-        //IL_0010: ret
 
         var method = dynamicType.DefineMethod(
             $"{methodInfo.Name}",
@@ -221,13 +221,13 @@ public abstract class V1Mapper : BaseMapper
         FieldBuilder field,
         ParameterInfo[] parameterInfo)
     {
-        //IL_0000: nop
-        //IL_0001: ldarg.0
-        //IL_0002: ldfld class ModelTestImpl.SimpleMethodTest ModelTestImpl.SimpleMethodTestImpl::simplemethodtest
-        //IL_0007: ldarg.1
-        //IL_0008: callvirt instance void ModelTestImpl.SimpleMethodTest::SetInt(int32)
-        //IL_000d: nop
-        //IL_000e: ret
+        // IL_0000: nop
+        // IL_0001: ldarg.0      // this
+        // IL_0002: ldfld        class ModelImplementation.Model ModelImplementation.Harness::model
+        // IL_0007: ldarg.1      // s
+        // IL_0008: callvirt     instance void ModelImplementation.Model::HasOut(string&)
+        // IL_000d: nop
+        // IL_000e: ret
 
         var paramTypes = parameterInfo.Select(p => p.ParameterType).ToArray();
 
@@ -240,6 +240,7 @@ public abstract class V1Mapper : BaseMapper
         var instanceMethodInfo = instance.Implementor.GetType().GetMethod(instance.ImplementorName);
 
         var methodIl = method.GetILGenerator();
+        methodIl.Emit(OpCodes.Nop);
         methodIl.Emit(OpCodes.Ldarg_0);
         methodIl.Emit(OpCodes.Ldfld, field);
         for (byte counter = 1; counter <= parameterInfo.Length; counter++)
@@ -265,6 +266,7 @@ public abstract class V1Mapper : BaseMapper
         }
 
         methodIl.Emit(OpCodes.Callvirt, instanceMethodInfo);
+        methodIl.Emit(OpCodes.Nop);
         methodIl.Emit(OpCodes.Ret);
     }
 
@@ -285,6 +287,18 @@ public abstract class V1Mapper : BaseMapper
             null);
 
         var instanceMethodInfo = instance.Implementor?.GetType()?.GetMethod(instance.ImplementorName);
+
+
+
+        // IL_0000: nop
+        // IL_0001: ldarg.0      // this
+        // IL_0002: ldfld        class ModelImplementation.Model ModelImplementation.Harness::model
+        // IL_0007: ldarg.1      // s
+        // IL_0008: callvirt     instance bool ModelImplementation.Model::HasOutReturn(string&)
+        // IL_000d: stloc.0      // V_0
+        // IL_000e: br.s         IL_0010
+        // IL_0010: ldloc.0      // V_0
+        // IL_0011: ret
 
         var methodIl = method.GetILGenerator();
         methodIl.Emit(OpCodes.Ldarg_0);
