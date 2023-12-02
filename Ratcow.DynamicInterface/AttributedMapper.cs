@@ -26,7 +26,7 @@ public class AttributedMapper : V1Mapper
 
             var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
-            var dynamicModule = assemblyBuilder.DefineDynamicModule($"{baseName}Dynamic");
+            var dynamicModule = assemblyBuilder.DefineDynamicModule($"{baseName}Dynamic"); // unique name? $"_{Guid.NewGuid().ToString().Replace('-', '0')}
 
             var dynamicType = dynamicModule.DefineType(baseName, TypeAttributes.Class | TypeAttributes.Public, null, new Type[] { interfaceType });
 
@@ -43,6 +43,11 @@ public class AttributedMapper : V1Mapper
                     var field = fieldData.FirstOrDefault(f => f.Name == methodInstance.Implementor.GetType().Name.ToLower());
                     AddMethod(dynamicType, method, methodInstance, field);
                 }
+                // else
+                // {
+                //     // add a default implementation.
+                //     AddMethodStub(dynamicType, method);
+                // }
             }
 
             var properties = interfaceType.GetPublicProperties();
@@ -67,16 +72,36 @@ public class AttributedMapper : V1Mapper
                 }
             }
 
-            var dtype = dynamicType.CreateType();
+            var dType = dynamicType.CreateType();
 
-            return dtype;
+            return dType;
         }
 
         return null;
     }
 
-    public override T CreateInstance<T>(params object[] instances) =>
-        (T)Activator.CreateInstance(CreateType<T>(instances), instances);
+    private void AddMethodStub(TypeBuilder typeBuilder, MethodInfo interfaceMethod)
+    {
+            var parameters = interfaceMethod.GetParameters().Select(info => info.ParameterType).ToArray();
+            var methodBuilder = typeBuilder.DefineMethod(interfaceMethod.Name,
+                MethodAttributes.Public
+                | MethodAttributes.Virtual
+                | MethodAttributes.HideBySig
+                | MethodAttributes.NewSlot
+                | MethodAttributes.Final,
+                interfaceMethod.ReturnType, parameters);
+
+            var ilGenerator = methodBuilder.GetILGenerator();
+
+            var local0 = ilGenerator.DeclareLocal(interfaceMethod.ReturnType); // will contain default value for our return type.
+
+            ilGenerator.Emit(OpCodes.Ldloca_S, local0);
+            ilGenerator.Emit(OpCodes.Initobj, interfaceMethod.ReturnType);
+            ilGenerator.Emit(OpCodes.Ldloc_0);
+            ilGenerator.Emit(OpCodes.Ret);
+    }
+
+    public override T CreateInstance<T>(params object[] instances) => (T)Activator.CreateInstance(CreateType<T>(instances), instances);
 
     /// <summary>
     /// Gets the method to type mapping
@@ -96,7 +121,7 @@ public class AttributedMapper : V1Mapper
                 foreach (var methodImplementation in methodImplementations)
                 {
                     if (methodImplementation.Interface == interfaceType &&
-                        methodImplementation.Name is {})
+                        methodImplementation.Name is not null)
                     {
                         result.Add((methodImplementation.Name, methodInfo.Name, instance));
                     }

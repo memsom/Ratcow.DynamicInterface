@@ -67,6 +67,7 @@ public abstract class V1Mapper : BaseMapper
             var field = typeBuilder.DefineField(type.Name.ToLower(), type, FieldAttributes.Public);
             result.Add(field);
         }
+
         return result.ToArray();
     }
 
@@ -97,13 +98,13 @@ public abstract class V1Mapper : BaseMapper
             null,
             new Type[] { propertyInfo.PropertyType });
 
-        var setMethodIL = setMethod.GetILGenerator();
-        setMethodIL.Emit(OpCodes.Ldarg_0);
-        setMethodIL.Emit(OpCodes.Ldfld, field);
-        setMethodIL.Emit(OpCodes.Ldarg_1);
-        setMethodIL.Emit(OpCodes.Callvirt, instancePropertySetter);
-        setMethodIL.Emit(OpCodes.Nop);
-        setMethodIL.Emit(OpCodes.Ret);
+        var setMethodIl = setMethod.GetILGenerator();
+        setMethodIl.Emit(OpCodes.Ldarg_0);
+        setMethodIl.Emit(OpCodes.Ldfld, field);
+        setMethodIl.Emit(OpCodes.Ldarg_1);
+        setMethodIl.Emit(OpCodes.Callvirt, instancePropertySetter);
+        setMethodIl.Emit(OpCodes.Nop);
+        setMethodIl.Emit(OpCodes.Ret);
         return setMethod;
     }
 
@@ -118,12 +119,12 @@ public abstract class V1Mapper : BaseMapper
             propertyInfo.PropertyType,
             null);
 
-        var getMethodIL = getMethod.GetILGenerator();
-        getMethodIL.Emit(OpCodes.Ldarg_0);
-        getMethodIL.Emit(OpCodes.Ldfld, field);
-        getMethodIL.Emit(OpCodes.Callvirt, instancePropertyGetter);
-        getMethodIL.Emit(OpCodes.Nop);
-        getMethodIL.Emit(OpCodes.Ret);
+        var getMethodIl = getMethod.GetILGenerator();
+        getMethodIl.Emit(OpCodes.Ldarg_0);
+        getMethodIl.Emit(OpCodes.Ldfld, field);
+        getMethodIl.Emit(OpCodes.Callvirt, instancePropertyGetter);
+        getMethodIl.Emit(OpCodes.Nop);
+        getMethodIl.Emit(OpCodes.Ret);
         return getMethod;
     }
 
@@ -162,7 +163,6 @@ public abstract class V1Mapper : BaseMapper
                 AddMethod_void_noparams(dynamicType, method, methodInstance, field);
             }
         }
-
     }
 
     /// <summary>
@@ -183,15 +183,14 @@ public abstract class V1Mapper : BaseMapper
         methodIl.Emit(OpCodes.Ldfld, field);
         methodIl.Emit(OpCodes.Callvirt, instanceMethodInfo);
         methodIl.Emit(OpCodes.Ret);
-
     }
 
     /// <summary>
     ///
     /// </summary>
-    void AddMethod_value_noparams(TypeBuilder dynamicType, MethodInfo methodInfo, (string Name, string ImplementorName, object Implementor) instance, FieldBuilder field, ParameterInfo returnInfo)
+    void AddMethod_value_noparams(TypeBuilder dynamicType, MethodInfo methodInfo, (string Name, string ImplementorName, object Implementor) instance, FieldBuilder field,
+        ParameterInfo returnInfo)
     {
-
         //IL_0001: ldarg.0
         //IL_0002: ldfld class ModelTestImpl.SimpleMethodTest ModelTestImpl.SimpleMethodTestImpl::simplemethodtest
         //IL_0007: callvirt instance int32 ModelTestImpl.SimpleMethodTest::GetInt()
@@ -210,13 +209,17 @@ public abstract class V1Mapper : BaseMapper
         methodIl.Emit(OpCodes.Ldfld, field);
         methodIl.Emit(OpCodes.Callvirt, instanceMethodInfo);
         methodIl.Emit(OpCodes.Ret);
-
     }
 
     /// <summary>
     ///
     /// </summary>
-    void AddMethod_void_params(TypeBuilder dynamicType, MethodInfo methodInfo, (string Name, string ImplementorName, object Implementor) instance, FieldBuilder field, ParameterInfo[] parameterInfo)
+    void AddMethod_void_params(
+        TypeBuilder dynamicType,
+        MethodInfo methodInfo,
+        (string Name, string ImplementorName, object Implementor) instance,
+        FieldBuilder field,
+        ParameterInfo[] parameterInfo)
     {
         //IL_0000: nop
         //IL_0001: ldarg.0
@@ -230,7 +233,7 @@ public abstract class V1Mapper : BaseMapper
 
         var method = dynamicType.DefineMethod(
             $"{methodInfo.Name}",
-            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual,
+            MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Final,
             null,
             paramTypes);
 
@@ -260,6 +263,7 @@ public abstract class V1Mapper : BaseMapper
                     break;
             }
         }
+
         methodIl.Emit(OpCodes.Callvirt, instanceMethodInfo);
         methodIl.Emit(OpCodes.Ret);
     }
@@ -267,15 +271,20 @@ public abstract class V1Mapper : BaseMapper
     /// <summary>
     ///
     /// </summary>
-    void AddMethod_value_params(TypeBuilder dynamicType, MethodInfo methodInfo, (string Name, string ImplementorName, object Implementor) instance, FieldBuilder field, ParameterInfo returnInfo, ParameterInfo[] parameterInfo)
+    void AddMethod_value_params(
+        TypeBuilder dynamicType,
+        MethodInfo methodInfo,
+        (string Name, string ImplementorName, object Implementor) instance,
+        FieldBuilder field,
+        ParameterInfo returnInfo, ParameterInfo[] parameterInfo)
     {
         var method = dynamicType.DefineMethod(
             $"{methodInfo.Name}",
-            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual,
+            MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Final,
             returnInfo.ParameterType,
             null);
 
-        var instanceMethodInfo = instance.Implementor.GetType().GetMethod(instance.ImplementorName);
+        var instanceMethodInfo = instance.Implementor?.GetType()?.GetMethod(instance.ImplementorName);
 
         var methodIl = method.GetILGenerator();
         methodIl.Emit(OpCodes.Ldarg_0);
@@ -301,7 +310,12 @@ public abstract class V1Mapper : BaseMapper
                     break;
             }
         }
-        methodIl.Emit(OpCodes.Callvirt, instanceMethodInfo);
+
+        if (instanceMethodInfo is not null)
+        {
+            methodIl.Emit(OpCodes.Callvirt, instanceMethodInfo);
+        }
+
         methodIl.Emit(OpCodes.Ret);
     }
 

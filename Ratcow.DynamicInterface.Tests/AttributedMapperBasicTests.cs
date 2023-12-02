@@ -4,7 +4,7 @@ using Ratcow.DynamicInterface.Tests.Support;
 namespace Ratcow.DynamicInterface.Tests;
 
 [TestFixture]
-public class AttributedMapper_BasicTests: BaseTest
+public class AttributedMapperBasicTests: BaseTest
 {
     [Test]
     public void AttributedMapper_BasicTest_InstantiateEngine()
@@ -23,9 +23,7 @@ public class AttributedMapper_BasicTests: BaseTest
 
         var instance = new object();
 
-        Type resultant = null;
-
-        resultant = engine.CreateType<IBasic>(instance);
+        var resultant = engine.CreateType<IBasic>(instance);
 
         VerifyType_Single_Instance(resultant, "Basic", typeof(object));
     }
@@ -39,9 +37,7 @@ public class AttributedMapper_BasicTests: BaseTest
 
         var instance = new object();
 
-        IBasic resultant = null;
-
-        resultant = engine.CreateInstance<IBasic>(instance);
+        var resultant = engine.CreateInstance<IBasic>(instance);
 
         Assert.IsNotNull(resultant, "Resultant can not be null");
 

@@ -5,7 +5,7 @@ using Ratcow.DynamicInterface.Tests.Support;
 namespace Ratcow.DynamicInterface.Tests;
 
 [TestFixture]
-public class AttributedMapper_PropertyTests : BaseTest
+public class AttributedMapperPropertyTests : BaseTest
 {
     [Test]
     public void AttributedMapper_PropertyTests_Property_Single_Int32_Type()
@@ -14,18 +14,16 @@ public class AttributedMapper_PropertyTests : BaseTest
 
         var engine = new AttributedMapper();
 
-        var instance = new Property_Single_Int32
+        var instance = new PropertySingleInt32
         {
             Test = testValue,
         };
 
-        Assert.AreEqual(instance.Test, testValue);
+        Assert.That(testValue, Is.EqualTo(instance.Test));
 
-        Type resultant;
+        var resultant = engine.CreateType<IPropertySingleInt32>(instance);
 
-        resultant = engine.CreateType<IProperty_Single_Int32>(instance);
-
-        VerifyType_Single_Instance(resultant, "Property_Single_Int32", typeof(Property_Single_Int32));
+        VerifyType_Single_Instance(resultant, nameof(PropertySingleInt32), typeof(PropertySingleInt32));
     }
 
     [Test]
@@ -36,18 +34,18 @@ public class AttributedMapper_PropertyTests : BaseTest
 
         var engine = new AttributedMapper();
 
-        var instance = new Property_Single_Int32
+        var instance = new PropertySingleInt32
         {
             Test = testValue,
         };
 
         Assert.That(testValue, Is.EqualTo(instance.Test), "Instance did not match testValue");
 
-        IProperty_Single_Int32 resultant;
+        IPropertySingleInt32 resultant;
 
-        resultant = engine.CreateInstance<IProperty_Single_Int32>(instance);
+        resultant = engine.CreateInstance<IPropertySingleInt32>(instance);
 
-        VerifyType_Single_Instance(resultant.GetType(), "Property_Single_Int32", typeof(Property_Single_Int32));
+        VerifyType_Single_Instance(resultant.GetType(), nameof(PropertySingleInt32), typeof(PropertySingleInt32));
 
         Assert.That(testValue, Is.EqualTo(resultant.TestI32), "Resultant did not match testValue");
         Assert.That(instance.Test, Is.EqualTo(resultant.TestI32), "Resultant did not match instance (testValue)");
@@ -66,7 +64,7 @@ public class AttributedMapper_PropertyTests : BaseTest
 
         var engine = new AttributedMapper();
 
-        var instance = new Property_Single_String
+        var instance = new PropertySingleString
         {
             Test = testValue,
         };
@@ -75,9 +73,9 @@ public class AttributedMapper_PropertyTests : BaseTest
 
         Type resultant;
 
-        resultant = engine.CreateType<IProperty_Single_String>(instance);
+        resultant = engine.CreateType<IPropertySingleString>(instance);
 
-        VerifyType_Single_Instance(resultant, "Property_Single_String", typeof(Property_Single_String));
+        VerifyType_Single_Instance(resultant, nameof(PropertySingleString), typeof(PropertySingleString));
     }
 
     [Test]
@@ -88,18 +86,18 @@ public class AttributedMapper_PropertyTests : BaseTest
 
         var engine = new AttributedMapper();
 
-        var instance = new Property_Single_String
+        var instance = new PropertySingleString
         {
             Test = testValue,
         };
 
         Assert.That(testValue, Is.EqualTo(instance.Test), "Instance did not match testValue");
 
-        IProperty_Single_String resultant;
+        IPropertySingleString resultant;
 
-        resultant = engine.CreateInstance<IProperty_Single_String>(instance);
+        resultant = engine.CreateInstance<IPropertySingleString>(instance);
 
-        VerifyType_Single_Instance(resultant.GetType(), "Property_Single_String", typeof(Property_Single_String));
+        VerifyType_Single_Instance(resultant.GetType(), nameof(PropertySingleString), typeof(PropertySingleString));
 
         Assert.That(testValue, Is.EqualTo(resultant.TestS), "Resultant did not match testValue");
         Assert.That(instance.Test, Is.EqualTo(resultant.TestS), "Resultant did not match instance (testValue)");
@@ -111,6 +109,8 @@ public class AttributedMapper_PropertyTests : BaseTest
         Assert.That(instance.Test, Is.EqualTo(resultant.TestS), "Resultant did not match instance (newTestValue)");
     }
 
+    private const string PropertyDoubleStringInt32 = "PropertyDoubleStringInt32"; // apparently this name is pulled out of thin air....
+
     [Test]
     public void AttributedMapper_PropertyTests_Property_Double_StringInt32_Type()
     {
@@ -119,12 +119,12 @@ public class AttributedMapper_PropertyTests : BaseTest
 
         var engine = new AttributedMapper();
 
-        var instanceS = new Property_Single_String
+        var instanceS = new PropertySingleString
         {
             Test = testValueS,
         };
 
-        var instanceI32 = new Property_Single_Int32
+        var instanceI32 = new PropertySingleInt32
         {
             Test = testValueI32,
         };
@@ -132,11 +132,9 @@ public class AttributedMapper_PropertyTests : BaseTest
         Assert.That(testValueS, Is.EqualTo(instanceS.Test));
         Assert.That(testValueI32, Is.EqualTo(instanceI32.Test));
 
-        Type resultant;
+        var resultant = engine.CreateType<IPropertyDoubleStringInt32>(instanceS, instanceI32);
 
-        resultant = engine.CreateType<IProperty_Double_StringInt32>(instanceS, instanceI32);
-
-        VerifyType_Double_Instance(resultant, "Property_Double_StringInt32", typeof(Property_Single_String), typeof(Property_Single_Int32));
+        VerifyType_Double_Instance(resultant, PropertyDoubleStringInt32, typeof(PropertySingleString), typeof(PropertySingleInt32));
     }
 
     [Test]
@@ -149,12 +147,12 @@ public class AttributedMapper_PropertyTests : BaseTest
 
         var engine = new AttributedMapper();
 
-        var instanceS = new Property_Single_String
+        var instanceS = new PropertySingleString
         {
             Test = testValueS,
         };
 
-        var instanceI32 = new Property_Single_Int32
+        var instanceI32 = new PropertySingleInt32
         {
             Test = testValueI32,
         };
@@ -162,16 +160,16 @@ public class AttributedMapper_PropertyTests : BaseTest
         Assert.That(testValueS, Is.EqualTo(instanceS.Test));
         Assert.That(testValueI32, Is.EqualTo(instanceI32.Test));
 
-        IProperty_Double_StringInt32 resultant;
-        resultant = engine.CreateInstance<IProperty_Double_StringInt32>(instanceS, instanceI32);
+        IPropertyDoubleStringInt32 resultant;
+        resultant = engine.CreateInstance<IPropertyDoubleStringInt32>(instanceS, instanceI32);
 
-        VerifyType_Double_Instance(resultant.GetType(), "Property_Double_StringInt32", typeof(Property_Single_String), typeof(Property_Single_Int32));
+        VerifyType_Double_Instance(resultant.GetType(), PropertyDoubleStringInt32, typeof(PropertySingleString), typeof(PropertySingleInt32));
 
-        Assert.That(testValueS, Is.EqualTo(resultant.TestS), "Resultant did not match testValueS");
-        Assert.That(instanceS.Test, Is.EqualTo(resultant.TestS), "Resultant did not match instance (testValueS)");
+        Assert.That(resultant.TestS, Is.EqualTo(testValueS), "Resultant did not match testValueS");
+        Assert.That(resultant.TestS, Is.EqualTo(instanceS.Test), "Resultant did not match instance (testValueS)");
 
-        Assert.That(testValueI32, Is.EqualTo(resultant.TestI32), "Resultant did not match testValueI32");
-        Assert.That(instanceI32.Test, Is.EqualTo(resultant.TestI32), "Resultant did not match instance (testValueI32)");
+        Assert.That(resultant.TestI32, Is.EqualTo(testValueI32), "Resultant did not match testValueI32");
+        Assert.That(resultant.TestI32, Is.EqualTo(instanceI32.Test), "Resultant did not match instance (testValueI32)");
 
         //adjust the value to check the property can be written to
         resultant.TestS = newTestValueS;
