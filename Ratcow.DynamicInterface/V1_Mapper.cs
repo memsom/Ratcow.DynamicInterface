@@ -5,6 +5,13 @@
 /// </summary>
 public abstract class V1Mapper : BaseMapper
 {
+    private const MethodAttributes MethodAttributes =
+        System.Reflection.MethodAttributes.Public |
+        System.Reflection.MethodAttributes.Virtual |
+        System.Reflection.MethodAttributes.HideBySig |
+        System.Reflection.MethodAttributes.NewSlot |
+        System.Reflection.MethodAttributes.Final;
+
     /// <summary>
     ///
     /// </summary>
@@ -27,27 +34,9 @@ public abstract class V1Mapper : BaseMapper
         {
             ctorIL.Emit(OpCodes.Ldarg_0);
 
-            switch (counter)
-            {
-                case 1:
-                    ctorIL.Emit(OpCodes.Ldarg_1);
-                    break;
-
-                case 2:
-                    ctorIL.Emit(OpCodes.Ldarg_2);
-                    break;
-
-                case 3:
-                    ctorIL.Emit(OpCodes.Ldarg_3);
-                    break;
-
-                default:
-                    ctorIL.Emit(OpCodes.Ldarg_S, counter);
-                    break;
-            }
+            GetIlParam(counter, ctorIL);
 
             counter++;
-
 
             ctorIL.Emit(OpCodes.Stfld, field);
         }
@@ -71,7 +60,11 @@ public abstract class V1Mapper : BaseMapper
         return result.ToArray();
     }
 
-    protected override void AddProperty(TypeBuilder typeBuilder, PropertyInfo propertyInfo, (string Name, string InstanceName, object Implementor) instance, FieldBuilder field)
+    protected override void AddProperty(
+        TypeBuilder typeBuilder,
+        PropertyInfo propertyInfo,
+        (string Name, string InstanceName, object Implementor) instance,
+        FieldBuilder field)
     {
         var propertyBuilder = typeBuilder.DefineProperty(propertyInfo.Name, PropertyAttributes.None, propertyInfo.PropertyType, null);
 
@@ -90,7 +83,11 @@ public abstract class V1Mapper : BaseMapper
     /// <summary>
     /// Creates a generic getter for the contained instances property
     /// </summary>
-    MethodBuilder AddPropertySetter(TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder field, MethodInfo instancePropertySetter)
+    MethodBuilder AddPropertySetter(
+        TypeBuilder typeBuilder,
+        PropertyInfo propertyInfo,
+        FieldBuilder field,
+        MethodInfo instancePropertySetter)
     {
         var setMethod = typeBuilder.DefineMethod(
             $"set_{propertyInfo.Name}",
@@ -111,7 +108,11 @@ public abstract class V1Mapper : BaseMapper
     /// <summary>
     /// Creates a generic setter for the contained instances property
     /// </summary>
-    MethodBuilder AddPropertyGetter(TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder field, MethodInfo instancePropertyGetter)
+    MethodBuilder AddPropertyGetter(
+        TypeBuilder typeBuilder,
+        PropertyInfo propertyInfo,
+        FieldBuilder field,
+        MethodInfo instancePropertyGetter)
     {
         var getMethod = typeBuilder.DefineMethod(
             $"get_{propertyInfo.Name}",
@@ -131,12 +132,16 @@ public abstract class V1Mapper : BaseMapper
     /// <summary>
     /// Generate methods for the contained instances
     /// </summary>
-    protected override void AddMethod(TypeBuilder dynamicType, MethodInfo method, (string Name, string implementorName, object Implementor) methodInstance, FieldBuilder field)
+    protected override void AddMethod(
+        TypeBuilder dynamicType,
+        MethodInfo method,
+        (string Name, string implementorName, object Implementor) methodInstance,
+        FieldBuilder field)
     {
         var returnInfo = method.ReturnParameter;
         var parameterInfo = method.GetParameters();
 
-        if (returnInfo != null && returnInfo.ParameterType != typeof(void))
+        if (returnInfo?.ParameterType != typeof(void))
         {
             if (parameterInfo is { Length: > 0 })
             {
@@ -168,11 +173,15 @@ public abstract class V1Mapper : BaseMapper
     /// <summary>
     ///
     /// </summary>
-    void AddMethod_void_noparams(TypeBuilder dynamicType, MethodInfo methodInfo, (string Name, string ImplementorName, object Implementor) instance, FieldBuilder field)
+    void AddMethod_void_noparams(
+        TypeBuilder dynamicType,
+        MethodInfo methodInfo,
+        (string Name, string ImplementorName, object Implementor) instance,
+        FieldBuilder field)
     {
         var method = dynamicType.DefineMethod(
             $"{methodInfo.Name}",
-            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual,
+            MethodAttributes,
             null,
             null);
 
@@ -198,7 +207,7 @@ public abstract class V1Mapper : BaseMapper
 
         var method = dynamicType.DefineMethod(
             $"{methodInfo.Name}",
-            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual,
+            MethodAttributes,
             returnInfo.ParameterType,
             null);
 
@@ -233,7 +242,7 @@ public abstract class V1Mapper : BaseMapper
 
         var method = dynamicType.DefineMethod(
             $"{methodInfo.Name}",
-            MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Final,
+            MethodAttributes,
             null,
             paramTypes);
 
@@ -245,24 +254,7 @@ public abstract class V1Mapper : BaseMapper
         methodIl.Emit(OpCodes.Ldfld, field);
         for (byte counter = 1; counter <= parameterInfo.Length; counter++)
         {
-            switch (counter)
-            {
-                case 1:
-                    methodIl.Emit(OpCodes.Ldarg_1);
-                    break;
-
-                case 2:
-                    methodIl.Emit(OpCodes.Ldarg_2);
-                    break;
-
-                case 3:
-                    methodIl.Emit(OpCodes.Ldarg_3);
-                    break;
-
-                default:
-                    methodIl.Emit(OpCodes.Ldarg_S, counter);
-                    break;
-            }
+            GetIlParam(counter, methodIl);
         }
 
         methodIl.Emit(OpCodes.Callvirt, instanceMethodInfo);
@@ -280,15 +272,15 @@ public abstract class V1Mapper : BaseMapper
         FieldBuilder field,
         ParameterInfo returnInfo, ParameterInfo[] parameterInfo)
     {
+        var paramTypes = parameterInfo.Select(p => p.ParameterType).ToArray();
+
         var method = dynamicType.DefineMethod(
             $"{methodInfo.Name}",
-            MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Final,
+            MethodAttributes,
             returnInfo.ParameterType,
-            null);
+            paramTypes);
 
         var instanceMethodInfo = instance.Implementor?.GetType()?.GetMethod(instance.ImplementorName);
-
-
 
         // IL_0000: nop
         // IL_0001: ldarg.0      // this
@@ -305,24 +297,7 @@ public abstract class V1Mapper : BaseMapper
         methodIl.Emit(OpCodes.Ldfld, field);
         for (byte counter = 1; counter <= parameterInfo.Length; counter++)
         {
-            switch (counter)
-            {
-                case 1:
-                    methodIl.Emit(OpCodes.Ldarg_1);
-                    break;
-
-                case 2:
-                    methodIl.Emit(OpCodes.Ldarg_2);
-                    break;
-
-                case 3:
-                    methodIl.Emit(OpCodes.Ldarg_3);
-                    break;
-
-                default:
-                    methodIl.Emit(OpCodes.Ldarg_S, counter);
-                    break;
-            }
+            GetIlParam(counter, methodIl);
         }
 
         if (instanceMethodInfo is not null)
@@ -333,10 +308,36 @@ public abstract class V1Mapper : BaseMapper
         methodIl.Emit(OpCodes.Ret);
     }
 
+    private static void GetIlParam(byte counter, ILGenerator methodIl)
+    {
+        switch (counter)
+        {
+            case 1:
+                methodIl.Emit(OpCodes.Ldarg_1);
+                break;
+
+            case 2:
+                methodIl.Emit(OpCodes.Ldarg_2);
+                break;
+
+            case 3:
+                methodIl.Emit(OpCodes.Ldarg_3);
+                break;
+
+            default:
+                methodIl.Emit(OpCodes.Ldarg_S, counter);
+                break;
+        }
+    }
+
     /// <summary>
     ///
     /// </summary>
-    protected override void AddEvent(TypeBuilder typeBuilder, EventInfo eventInfo, (string Name, string InstanceName, object Implementor) instance, FieldBuilder field)
+    protected override void AddEvent(
+        TypeBuilder typeBuilder,
+        EventInfo eventInfo,
+        (string Name, string InstanceName, object Implementor) instance,
+        FieldBuilder field)
     {
         var eventBuilder = typeBuilder.DefineEvent(eventInfo.Name, EventAttributes.None, eventInfo.EventHandlerType);
 
@@ -351,6 +352,7 @@ public abstract class V1Mapper : BaseMapper
             null,
             new Type[] { eventInfo.EventHandlerType });
 
+        // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         addMethodBuilder.SetImplementationFlags(MethodImplAttributes.Managed | MethodImplAttributes.Synchronized);
 
         var addMethodBuilderIl = addMethodBuilder.GetILGenerator();
@@ -370,6 +372,7 @@ public abstract class V1Mapper : BaseMapper
             null,
             new Type[] { eventInfo.EventHandlerType });
 
+        // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         removeMethodBuilder.SetImplementationFlags(MethodImplAttributes.Managed | MethodImplAttributes.Synchronized);
 
         var removeMethodBuilderIl = removeMethodBuilder.GetILGenerator();

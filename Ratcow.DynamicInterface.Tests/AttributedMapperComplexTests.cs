@@ -8,7 +8,7 @@ namespace Ratcow.DynamicInterface.Tests;
 public class AttributedMapperComplexTests: BaseTest
 {
     [Test]
-    public void AttributedMapper_BasicTest_OneType()
+    public void AttributedMapper_ComplexExample()
     {
         var engine = new AttributedMapper();
 
@@ -16,7 +16,9 @@ public class AttributedMapperComplexTests: BaseTest
 
         var instance = new ComplexExample();
 
-        // currently fails as I think it generates the wrong IL
+        VerifyType_Single_Instance(engine.CreateType<IComplexExample>(instance), nameof(ComplexExample), typeof(ComplexExample));
+
+        // test actual instance
 
         var resultant = engine.CreateInstance<IComplexExample>(instance);
 
@@ -25,7 +27,10 @@ public class AttributedMapperComplexTests: BaseTest
         resultant.Simple0();
         resultant.Simple1(10);
 
+        resultant.Simple1Out(out var r);
+        System.Diagnostics.Debug.WriteLine($"Received Simple1Out(out {r})");
 
-        // VerifyType_Single_Instance(resultant, nameof(ComplexExample), typeof(ComplexExample));
+        var result = resultant.Simple0Return();
+        System.Diagnostics.Debug.WriteLine($"Received Simple0Return -> {result}");
     }
 }
