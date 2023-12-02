@@ -31,7 +31,7 @@ namespace Ratcow.DynamicInterface
                     Name = $"{interfaceType.Namespace}.Dynamic"
                 };
 
-                var assemblyBuilder = appDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+                var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
                 var dynamicModule = assemblyBuilder.DefineDynamicModule($"{baseName}Dynamic");
 

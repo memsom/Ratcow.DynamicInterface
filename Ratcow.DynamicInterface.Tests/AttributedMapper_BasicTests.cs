@@ -1,14 +1,12 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Ratcow.DynamicInterface.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class AttributedMapper_BasicTests: BaseTest
     {
-
-
-        [TestMethod]
+        [Test]
         public void AttributedMapper_BasicTest_InstantiateEngine()
         {
             var engine = new AttributedMapper();
@@ -16,7 +14,7 @@ namespace Ratcow.DynamicInterface.Tests
             Assert.IsNotNull(engine, "Engine can not be null");
         }
 
-        [TestMethod]
+        [Test]
         public void AttributedMapper_BasicTest_OneType()
         {
             var engine = new AttributedMapper();
@@ -32,7 +30,7 @@ namespace Ratcow.DynamicInterface.Tests
             VerifyType_Single_Instance(resultant, "Basic", typeof(object));
         }
 
-        [TestMethod]
+        [Test]
         public void AttributedMapper_BasicTest_OneInstance()
         {
             var engine = new AttributedMapper();

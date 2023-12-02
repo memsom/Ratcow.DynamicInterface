@@ -1,61 +1,43 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">-->
+<!--  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
+<!--  <PropertyGroup>-->
+<!--    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>-->
+<!--    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>-->
+<!--    <ProjectGuid>{97014619-E77A-4895-9DE1-E627177B2E35}</ProjectGuid>-->
+<!--    <OutputType>Library</OutputType>-->
+<!--    <AppDesignerFolder>Properties</AppDesignerFolder>-->
+<!--    <RootNamespace>Ratcow.DynamicInterface</RootNamespace>-->
+<!--    <AssemblyName>Ratcow.DynamicInterface</AssemblyName>-->
+<!--    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>-->
+<!--    <FileAlignment>512</FileAlignment>-->
+<!--  </PropertyGroup>-->
+<!--  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">-->
+<!--    <DebugSymbols>true</DebugSymbols>-->
+<!--    <DebugType>full</DebugType>-->
+<!--    <Optimize>false</Optimize>-->
+<!--    <OutputPath>bin\Debug\</OutputPath>-->
+<!--    <DefineConstants>DEBUG;TRACE</DefineConstants>-->
+<!--    <ErrorReport>prompt</ErrorReport>-->
+<!--    <WarningLevel>4</WarningLevel>-->
+<!--  </PropertyGroup>-->
+<!--  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">-->
+<!--    <DebugType>pdbonly</DebugType>-->
+<!--    <Optimize>true</Optimize>-->
+<!--    <OutputPath>bin\Release\</OutputPath>-->
+<!--    <DefineConstants>TRACE</DefineConstants>-->
+<!--    <ErrorReport>prompt</ErrorReport>-->
+<!--    <WarningLevel>4</WarningLevel>-->
+<!--  </PropertyGroup>-->
+
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{97014619-E77A-4895-9DE1-E627177B2E35}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ratcow.DynamicInterface</RootNamespace>
-    <AssemblyName>Ratcow.DynamicInterface</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AttributedMapper.cs" />
-    <Compile Include="BaseMapper.cs" />
-    <Compile Include="EventImplementationAttribute.cs" />
-    <Compile Include="EventInfoExtension.cs" />
-    <Compile Include="MethodImplementationAttribute.cs" />
-    <Compile Include="MethodInfoExtension.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyImplementationAttribute.cs" />
-    <Compile Include="PropertyInfoExtension.cs" />
-    <Compile Include="V1_Mapper.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
