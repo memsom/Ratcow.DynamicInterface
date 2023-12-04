@@ -19,29 +19,29 @@ public abstract class V1Mapper : BaseMapper
     {
         var paramList = fields.Select(f => f.FieldType).ToArray();
         var type = Type.GetType("System.Object");
-        var ctor = type.GetConstructor(new Type[0]);
+        var ctor = type.GetConstructor(Array.Empty<Type>());
 
         var constructorBuilder = typeBuilder.DefineConstructor(
             MethodAttributes.Public,
             CallingConventions.Standard,
             paramList);
-        var ctorIL = constructorBuilder.GetILGenerator();
+        var ctorIl = constructorBuilder.GetILGenerator();
 
-        ctorIL.Emit(OpCodes.Ldarg_0);
-        ctorIL.Emit(OpCodes.Call, ctor);
+        ctorIl.Emit(OpCodes.Ldarg_0);
+        ctorIl.Emit(OpCodes.Call, ctor);
         byte counter = 1;
         foreach (var field in fields)
         {
-            ctorIL.Emit(OpCodes.Ldarg_0);
+            ctorIl.Emit(OpCodes.Ldarg_0);
 
-            GetIlParam(counter, ctorIL);
+            GetIlParam(counter, ctorIl);
 
             counter++;
 
-            ctorIL.Emit(OpCodes.Stfld, field);
+            ctorIl.Emit(OpCodes.Stfld, field);
         }
 
-        ctorIL.Emit(OpCodes.Ret);
+        ctorIl.Emit(OpCodes.Ret);
     }
 
     /// <summary>

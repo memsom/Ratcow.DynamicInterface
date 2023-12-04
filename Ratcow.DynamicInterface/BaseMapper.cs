@@ -5,12 +5,12 @@ public abstract class BaseMapper
     /// <summary>
     /// Creates the raw type given the interface and objects provided
     /// </summary>
-    public abstract Type? CreateType<T>(params object[] instances);
+    protected abstract Type? CreateTypeImplementation<T>(params object[] instances);
 
     /// <summary>
     /// Creates an instance of the dynamic type for the given interface and objects provided
     /// </summary>
-    public abstract T? CreateInstance<T>(params object[] instances);
+    protected abstract T? CreateInstanceImplementation<T>(params object[] instances);
 
     /// <summary>
     /// Create a constructor appropriate for this instance
@@ -37,18 +37,60 @@ public abstract class BaseMapper
     /// </summary>
     protected abstract void AddEvent(TypeBuilder typeBuilder, EventInfo eventInfo, (string Name, string InstanceName, object Implementor) instance, FieldBuilder field);
 
-    /// <summary>
-    /// Gets the method to type mapping.
-    /// </summary>
-    protected abstract (string Name, string ImplementorName, object Implementor)[] GetMethodData<T>(object[] instances);
+    protected static IEnumerable<MethodInfo> GetMethods(Type type)
+    {
+        foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+        {
+            yield return method;
+        }
 
-    /// <summary>
-    /// Gets the property to type mapping.
-    /// </summary>
-    protected abstract (string Name, string InstanceName, object Implementor)[] GetPropertyData<T>(object[] instances);
+        if (type.IsInterface)
+        {
+            foreach (var iface in type.GetInterfaces())
+            {
+                foreach (var method in GetMethods(iface))
+                {
+                    yield return method;
+                }
+            }
+        }
+    }
 
-    /// <summary>
-    /// Gets the event to type mapping.
-    /// </summary>
-    protected abstract (string Name, string InstanceName, object Implementor)[] GetEventData<T>(object[] instances);
+    protected static IEnumerable<PropertyInfo> GetProperties(Type type)
+    {
+        foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+        {
+            yield return property;
+        }
+
+        if (type.IsInterface)
+        {
+            foreach (var iface in type.GetInterfaces())
+            {
+                foreach (var property in GetProperties(iface))
+                {
+                    yield return property;
+                }
+            }
+        }
+    }
+
+    protected static IEnumerable<EventInfo> GetEvents(Type type)
+    {
+        foreach (var eventinfo in type.GetEvents(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+        {
+            yield return eventinfo;
+        }
+
+        if (type.IsInterface)
+        {
+            foreach (var iface in type.GetInterfaces())
+            {
+                foreach (var eventinfo in GetEvents(iface))
+                {
+                    yield return eventinfo;
+                }
+            }
+        }
+    }
 }

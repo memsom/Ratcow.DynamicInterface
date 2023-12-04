@@ -1,27 +1,30 @@
-﻿namespace Ratcow.DynamicInterface;
+namespace Ratcow.DynamicInterface;
 
-// this basically implements AttributedMapper, but it uses 2 instances to create detours
-
-/// <summary>
-/// a basic implementation with attributes.
-///
-/// This is the basic initial version from with a non attributed version will grow
-/// </summary>
-public class AttributedMapper : V1Mapper
+public class ChainingAttributedMapper : V1Mapper
 {
-    public Type? CreateType<T>(params object[] instances) =>
-        CreateTypeImplementation<T>(instances);
+    public Type? CreateType<T>(object detour, object fallback) =>
+        CreateTypeImplementation<T>(detour, fallback);
     
     protected override Type? CreateTypeImplementation<T>(params object[] instances)
     {
         var interfaceType = typeof(T);
-        if (interfaceType.IsInterface)
+        if (interfaceType.IsInterface && instances is [{} detour, {}  fallback])
         {
             var baseName = interfaceType.Name.Substring(1);
 
-            var propertyData = GetPropertyData<T>(instances);
-            var methodData = GetMethodData<T>(instances);
-            var eventData = GetEventData<T>(instances);
+            var fallbackType = fallback.GetType();
+            
+            // verify the fallback implements the interface
+            if (!interfaceType.IsAssignableFrom(fallbackType))
+            {
+                throw new ArgumentException(nameof(fallback));
+            }
+            
+            var detourType = detour.GetType();
+
+            var propertyData = GetPropertyData<T>(detourType, detour, fallback);
+            var methodData = GetMethodData<T>(detourType, detour, fallback);
+            var eventData = GetEventData<T>(detourType, detour, fallback);
 
             Thread.GetDomain();
             var assemblyName = new AssemblyName()
@@ -80,63 +83,71 @@ public class AttributedMapper : V1Mapper
         return null;
     }
 
-    public T CreateInstance<T>(params object[] instances) => CreateInstanceImplementation<T>(instances);
-    
-    protected override T CreateInstanceImplementation<T>(params object[] instances) => (T)Activator.CreateInstance(CreateTypeImplementation<T>(instances), instances);
+    public T CreateInstance<T>(object detour, object fallback) => 
+        (T)Activator.CreateInstance(CreateType<T>(detour, fallback), detour, fallback);
+
+    protected override T CreateInstanceImplementation<T>(params object[] instances) => throw new NotImplementedException();
 
     /// <summary>
     /// Gets the method to type mapping
     /// </summary>
-    private (string Name, string ImplementorName, object Implementor)[] GetMethodData<T>(object[] instances)
+    private (string Name, string ImplementorName, object Implementor)[] GetMethodData<T>(Type detourType, object detour, object fallback)
     {
         var result = new List<(string Name, string ImplementorName, object Implementor)>();
         var interfaceType = typeof(T);
-
-        foreach (var instance in instances)
+        
+        var methodInfoArray = GetMethods(interfaceType);
+        foreach (var methodInfo in methodInfoArray)
         {
-            var type = instance.GetType();
-            var methodInfoArray = GetMethods(type);
-            foreach (var methodInfo in methodInfoArray)
+            if (detourType.GetMethod(methodInfo.Name) is { } dp)
             {
-                var methodImplementations = (MethodImplementationAttribute[])(methodInfo.GetCustomAttributes(typeof(MethodImplementationAttribute), true));
+                var methodImplementations = (MethodImplementationAttribute[])(dp.GetCustomAttributes(typeof(MethodImplementationAttribute), true));
                 foreach (var methodImplementation in methodImplementations)
                 {
-                    if (methodImplementation.Interface == interfaceType &&
-                        methodImplementation.Name is not null)
+                    if (methodImplementation is { Name: {} impName, Interface: {} iType} &&
+                        dp is { Name : {} name} && detour is not null &&
+                        (interfaceType == iType || interfaceType.GetInterfaces().Contains(iType)))
                     {
-                        result.Add((methodImplementation.Name, methodInfo.Name, instance));
+                        result.Add((impName, name, detour));
                     }
                 }
             }
+            else
+            {
+                result.Add((methodInfo.Name, methodInfo.Name, fallback));
+            }
         }
-
+        
         return result.ToArray();
     }
 
     /// <summary>
     /// Gets the property to type mapping
     /// </summary>
-    private (string Name, string InstanceName, object Implementor)[] GetPropertyData<T>(object[] instances)
+    private (string Name, string InstanceName, object Implementor)[] GetPropertyData<T>(Type detourType, object detour, object fallback)
     {
         var result = new List<(string Name, string instanceName, object Implementor)>();
         var interfaceType = typeof(T);
-
-        foreach (var instance in instances)
+        
+        var propertyInfoArray = GetProperties(interfaceType);
+        foreach (var propertyInfo in propertyInfoArray)
         {
-            var type = instance.GetType();
-            var propertyInfoArray = GetProperties(type);
-            foreach (var propertyInfo in propertyInfoArray)
+            if (detourType.GetProperty(propertyInfo.Name) is { } dp)
             {
-                var propertyImplementations = (PropertyImplementationAttribute[])(propertyInfo.GetCustomAttributes(typeof(PropertyImplementationAttribute), true));
+                var propertyImplementations = (PropertyImplementationAttribute[])(dp.GetCustomAttributes(typeof(PropertyImplementationAttribute), true));
                 foreach (var propertyImplementation in propertyImplementations)
                 {
                     if (propertyImplementation is { Name: {} impName, Interface: {} iType} &&
-                        propertyInfo is { Name : {} name} && instance is not null &&
+                        dp is { Name : {} name} && detour is not null &&
                         (interfaceType == iType || interfaceType.GetInterfaces().Contains(iType)))
                     {
-                        result.Add((impName, name, instance));
+                        result.Add((impName, name, detour));
                     }
                 }
+            }
+            else
+            {
+                result.Add((propertyInfo.Name, propertyInfo.Name, fallback));
             }
         }
 
@@ -146,31 +157,33 @@ public class AttributedMapper : V1Mapper
     /// <summary>
     /// Gets the event to type mapping
     /// </summary>
-    private (string Name, string InstanceName, object Implementor)[] GetEventData<T>(object[] instances)
+    private (string Name, string InstanceName, object Implementor)[] GetEventData<T>(Type detourType, object detour, object fallback)
     {
         var result = new List<(string Name, string instanceName, object Implementor)>();
         var interfaceType = typeof(T);
-
-        foreach (var instance in instances)
+        
+        var eventInfoArray = GetEvents(interfaceType);
+        foreach (var eventInfo in eventInfoArray)
         {
-            var type = instance.GetType();
-            var eventInfoArray = GetEvents(type);
-            foreach (var eventInfo in eventInfoArray)
+            if (detourType.GetEvent(eventInfo.Name) is { } dp)
             {
-                var eventImplementations = (EventImplementationAttribute[])(eventInfo.GetCustomAttributes(typeof(EventImplementationAttribute), true));
+                var eventImplementations = (EventImplementationAttribute[])(dp.GetCustomAttributes(typeof(EventImplementationAttribute), true));
                 foreach (var eventImplementation in eventImplementations)
                 {
-                    if (eventImplementation is { Name: {} impName, Interface: {} iType} &&
-                        eventInfo is { Name : {} name} && instance is not null &&
+                    if (eventImplementation is { Name: { } impName, Interface: { } iType } &&
+                        dp is { Name : { } name } && detour is not null &&
                         (interfaceType == iType || interfaceType.GetInterfaces().Contains(iType)))
                     {
-                        result.Add((impName, name, instance));
+                        result.Add((impName, name, detour));
                     }
                 }
+            }
+            else
+            {
+                result.Add((eventInfo.Name, eventInfo.Name, fallback));
             }
         }
 
         return result.ToArray();
     }
-
 }

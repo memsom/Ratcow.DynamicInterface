@@ -71,9 +71,7 @@ public class AttributedMapperPropertyTests : BaseTest
 
         Assert.That(testValue, Is.EqualTo(instance.Test));
 
-        Type resultant;
-
-        resultant = engine.CreateType<IPropertySingleString>(instance);
+        var resultant = engine.CreateType<IPropertySingleString>(instance);
 
         VerifyType_Single_Instance(resultant, nameof(PropertySingleString), typeof(PropertySingleString));
     }
