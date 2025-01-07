@@ -1,13 +1,8 @@
-﻿using Ratcow.DynamicInterface.Tests.Data;
-using Ratcow.DynamicInterface.Tests.Data.Interfaces;
-using Ratcow.DynamicInterface.Tests.Support;
+﻿namespace Ratcow.DynamicInterface.Tests;
 
-namespace Ratcow.DynamicInterface.Tests;
-
-[TestFixture]
 public class AttributedMapperPropertyTests : BaseTest
 {
-    [Test]
+    [Fact]
     public void AttributedMapper_PropertyTests_Property_Single_Int32_Type()
     {
         var testValue = 10;
@@ -19,14 +14,14 @@ public class AttributedMapperPropertyTests : BaseTest
             Test = testValue,
         };
 
-        Assert.That(testValue, Is.EqualTo(instance.Test));
+        Assert.Equal(testValue, instance.Test);
 
         var resultant = engine.CreateType<IPropertySingleInt32>(instance);
 
         VerifyType_Single_Instance(resultant, nameof(PropertySingleInt32), typeof(PropertySingleInt32));
     }
 
-    [Test]
+    [Fact]
     public void AttributedMapper_PropertyTests_Property_Single_Int32_Instance()
     {
         var testValue = 10;
@@ -39,7 +34,7 @@ public class AttributedMapperPropertyTests : BaseTest
             Test = testValue,
         };
 
-        Assert.That(testValue, Is.EqualTo(instance.Test), "Instance did not match testValue");
+        Assert.Equal(testValue, instance.Test);
 
         IPropertySingleInt32 resultant;
 
@@ -47,17 +42,17 @@ public class AttributedMapperPropertyTests : BaseTest
 
         VerifyType_Single_Instance(resultant.GetType(), nameof(PropertySingleInt32), typeof(PropertySingleInt32));
 
-        Assert.That(testValue, Is.EqualTo(resultant.TestI32), "Resultant did not match testValue");
-        Assert.That(instance.Test, Is.EqualTo(resultant.TestI32), "Resultant did not match instance (testValue)");
+        Assert.Equal(testValue, resultant.TestI32);
+        Assert.Equal(instance.Test, resultant.TestI32);
 
         //adjust the value to check the property can be written to
         resultant.TestI32 = newTestValue;
 
-        Assert.That(newTestValue, Is.EqualTo(resultant.TestI32), "Resultant did not match testValue");
-        Assert.That(instance.Test, Is.EqualTo(resultant.TestI32), "Resultant did not match instance (newTestValue)");
+        Assert.Equal(newTestValue, resultant.TestI32);
+        Assert.Equal(instance.Test, resultant.TestI32);
     }
 
-    [Test]
+    [Fact]
     public void AttributedMapper_PropertyTests_Property_Single_String_Type()
     {
         var testValue = "Hello, world";
@@ -69,14 +64,14 @@ public class AttributedMapperPropertyTests : BaseTest
             Test = testValue,
         };
 
-        Assert.That(testValue, Is.EqualTo(instance.Test));
+        Assert.Equal(testValue, instance.Test);
 
         var resultant = engine.CreateType<IPropertySingleString>(instance);
 
         VerifyType_Single_Instance(resultant, nameof(PropertySingleString), typeof(PropertySingleString));
     }
 
-    [Test]
+    [Fact]
     public void AttributedMapper_PropertyTests_Property_Single_String_Instance()
     {
         var testValue = "Hello, world";
@@ -89,27 +84,25 @@ public class AttributedMapperPropertyTests : BaseTest
             Test = testValue,
         };
 
-        Assert.That(testValue, Is.EqualTo(instance.Test), "Instance did not match testValue");
+        Assert.Equal(testValue, instance.Test);
 
-        IPropertySingleString resultant;
-
-        resultant = engine.CreateInstance<IPropertySingleString>(instance);
+        var resultant = engine.CreateInstance<IPropertySingleString>(instance);
 
         VerifyType_Single_Instance(resultant.GetType(), nameof(PropertySingleString), typeof(PropertySingleString));
 
-        Assert.That(testValue, Is.EqualTo(resultant.TestS), "Resultant did not match testValue");
-        Assert.That(instance.Test, Is.EqualTo(resultant.TestS), "Resultant did not match instance (testValue)");
+        Assert.Equal(testValue, resultant.TestS);
+        Assert.Equal(instance.Test, resultant.TestS);
 
         //adjust the value to check the property can be written to
         resultant.TestS = newTestValue;
 
-        Assert.That(newTestValue, Is.EqualTo(resultant.TestS), "Resultant did not match newTestValue");
-        Assert.That(instance.Test, Is.EqualTo(resultant.TestS), "Resultant did not match instance (newTestValue)");
+        Assert.Equal(newTestValue, resultant.TestS);
+        Assert.Equal(instance.Test, resultant.TestS);
     }
 
     private const string PropertyDoubleStringInt32 = "PropertyDoubleStringInt32"; // apparently this name is pulled out of thin air....
 
-    [Test]
+    [Fact]
     public void AttributedMapper_PropertyTests_Property_Double_StringInt32_Type()
     {
         var testValueS = "Hello, world";
@@ -127,15 +120,15 @@ public class AttributedMapperPropertyTests : BaseTest
             Test = testValueI32,
         };
 
-        Assert.That(testValueS, Is.EqualTo(instanceS.Test));
-        Assert.That(testValueI32, Is.EqualTo(instanceI32.Test));
+        Assert.Equal(testValueS, instanceS.Test);
+        Assert.Equal(testValueI32, instanceI32.Test);
 
         var resultant = engine.CreateType<IPropertyDoubleStringInt32>(instanceS, instanceI32);
 
         VerifyType_Double_Instance(resultant, PropertyDoubleStringInt32, typeof(PropertySingleString), typeof(PropertySingleInt32));
     }
 
-    [Test]
+    [Fact]
     public void AttributedMapper_PropertyTests_Property_Double_StringInt32_Instance()
     {
         var testValueS = "Hello, world";
@@ -155,29 +148,29 @@ public class AttributedMapperPropertyTests : BaseTest
             Test = testValueI32,
         };
 
-        Assert.That(testValueS, Is.EqualTo(instanceS.Test));
-        Assert.That(testValueI32, Is.EqualTo(instanceI32.Test));
+        Assert.Equal(testValueS, instanceS.Test);
+        Assert.Equal(testValueI32, instanceI32.Test);
 
         IPropertyDoubleStringInt32 resultant;
         resultant = engine.CreateInstance<IPropertyDoubleStringInt32>(instanceS, instanceI32);
 
         VerifyType_Double_Instance(resultant.GetType(), PropertyDoubleStringInt32, typeof(PropertySingleString), typeof(PropertySingleInt32));
 
-        Assert.That(resultant.TestS, Is.EqualTo(testValueS), "Resultant did not match testValueS");
-        Assert.That(resultant.TestS, Is.EqualTo(instanceS.Test), "Resultant did not match instance (testValueS)");
+        Assert.Equal(resultant.TestS, testValueS);
+        Assert.Equal(resultant.TestS, instanceS.Test);
 
-        Assert.That(resultant.TestI32, Is.EqualTo(testValueI32), "Resultant did not match testValueI32");
-        Assert.That(resultant.TestI32, Is.EqualTo(instanceI32.Test), "Resultant did not match instance (testValueI32)");
+        Assert.Equal(resultant.TestI32, testValueI32);
+        Assert.Equal(resultant.TestI32, instanceI32.Test);
 
         //adjust the value to check the property can be written to
         resultant.TestS = newTestValueS;
         resultant.TestI32 = newTestValueI32;
 
-        Assert.That(newTestValueS, Is.EqualTo(resultant.TestS), "Resultant did not match newTestValueS");
-        Assert.That(instanceS.Test, Is.EqualTo(resultant.TestS), "Resultant did not match instance (newTestValueS)");
+        Assert.Equal(newTestValueS, resultant.TestS);
+        Assert.Equal(instanceS.Test, resultant.TestS);
 
-        Assert.That(newTestValueI32, Is.EqualTo(resultant.TestI32), "Resultant did not match newTestValueI32");
-        Assert.That(instanceI32.Test, Is.EqualTo(resultant.TestI32), "Resultant did not match instance (newTestValueI32)");
+        Assert.Equal(newTestValueI32, resultant.TestI32);
+        Assert.Equal(instanceI32.Test, resultant.TestI32);
     }
 
 

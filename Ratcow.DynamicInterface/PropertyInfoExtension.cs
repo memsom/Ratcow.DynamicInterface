@@ -7,7 +7,7 @@ public static class PropertyInfoExtension
         if (!type.IsInterface)
             return type.GetProperties();
 
-        return (new Type[] { type })
+        return (new[] {type})
             .Concat(type.GetInterfaces())
             .SelectMany(i => i.GetProperties());
     }

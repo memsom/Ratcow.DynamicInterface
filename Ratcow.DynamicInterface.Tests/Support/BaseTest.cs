@@ -5,70 +5,58 @@ public class BaseTest
     /// <summary>
     /// Boiler plate code to verify the type.
     /// </summary>
-    protected void VerifyType_Single_Instance(Type? resultant, string expectedTypeName, Type expectedConstructorType)
+    protected static void VerifyType_Single_Instance(Type? resultant, string expectedTypeName, Type expectedConstructorType)
     {
-        Assert.IsNotNull(resultant, "Resultant can not be null");
+        Assert.NotNull(resultant);
 
-        if (resultant is null)
-        {
-            Assert.Fail(); // this is here only to make the compiler happy about nullables
-            return;
-        }
-
-        Assert.That(expectedTypeName, Is.EqualTo(resultant.Name), $"Resultant Type.Name should equal '{expectedTypeName}'");
+        Assert.Equal(expectedTypeName, resultant.Name);
 
         var fields = resultant.GetFields();
 
-        Assert.IsNotNull(fields, $"{expectedTypeName} should contain fields");
+        Assert.NotNull(fields);
 
-        Assert.That(fields.Length, Is.EqualTo(1), $"{expectedTypeName} should include one field");
+        Assert.Single(fields);
 
         var constructors = resultant.GetConstructors();
 
-        Assert.IsNotNull(constructors, $"{expectedTypeName} should contain constructors");
+        Assert.NotNull(constructors);
 
-        Assert.That(constructors.Length, Is.EqualTo(1), $"{expectedTypeName} should include one constructors");
+        Assert.Single(constructors);
 
         var constructorParams = constructors[0].GetParameters();
 
-        Assert.That(constructorParams.Length, Is.EqualTo(1), $"{expectedTypeName} constructors should include one parameter");
+        Assert.Single(constructorParams);
 
-        Assert.That(expectedConstructorType, Is.EqualTo(constructorParams[0].ParameterType), $"{expectedTypeName} constructors should include one parameter or type {expectedConstructorType}");
+        Assert.Equal(expectedConstructorType,constructorParams[0].ParameterType);
     }
 
     /// <summary>
     /// Boiler plate code to verify the type.
     /// </summary>
-    protected void VerifyType_Double_Instance(Type? resultant, string expectedTypeName, Type expectedConstructorType1, Type expectedConstructorType2)
+    protected static void VerifyType_Double_Instance(Type? resultant, string expectedTypeName, Type expectedConstructorType1, Type expectedConstructorType2)
     {
-        Assert.IsNotNull(resultant, "Resultant can not be null");
+        Assert.NotNull(resultant);
 
-        if (resultant is null)
-        {
-            Assert.Fail(); // this is here only to make the compiler happy about nullables
-            return;
-        }
-
-        Assert.That(expectedTypeName, Is.EqualTo(resultant.Name), $"Resultant Type.Name should equal '{expectedTypeName}'");
+        Assert.Equal(expectedTypeName, resultant.Name);
 
         var fields = resultant.GetFields();
 
-        Assert.IsNotNull(fields, $"{expectedTypeName} should contain fields");
+        Assert.NotNull(fields);
 
-        Assert.That(fields.Length, Is.EqualTo(2), $"{expectedTypeName} should include two fields");
+        Assert.Equal(2, fields.Length);
 
         var constructors = resultant.GetConstructors();
 
-        Assert.IsNotNull(constructors, $"{expectedTypeName} should contain constructors");
+        Assert.NotNull(constructors);
 
-        Assert.That(constructors.Length, Is.EqualTo(1), $"{expectedTypeName} should include one constructors");
+        Assert.Single(constructors);
 
         var constructorParams = constructors[0].GetParameters();
 
-        Assert.That(constructorParams.Length, Is.EqualTo(2), $"{expectedTypeName} constructors should include two parameter");
+        Assert.Equal(2, constructorParams.Length);
 
-        Assert.That(expectedConstructorType1, Is.EqualTo(constructorParams[0].ParameterType), $"{expectedTypeName} constructors should include one parameter or type {expectedConstructorType1}");
+        Assert.Equal(expectedConstructorType1, constructorParams[0].ParameterType);
 
-        Assert.That(expectedConstructorType2, Is.EqualTo(constructorParams[1].ParameterType), $"{expectedTypeName} constructors should include one parameter or type {expectedConstructorType2}");
+        Assert.Equal(expectedConstructorType2, constructorParams[1].ParameterType);
     }
 }

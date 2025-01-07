@@ -1,3 +1,6 @@
 // Global using directives
 
-global using NUnit.Framework;
+global using Ratcow.DynamicInterface.Tests.Data;
+global using Ratcow.DynamicInterface.Tests.Data.Interfaces;
+global using Ratcow.DynamicInterface.Tests.Support;
+global using Xunit;

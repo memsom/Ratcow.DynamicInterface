@@ -10,13 +10,13 @@ public class Model : IModel
 {
     public void HasOut(out string? s)
     {
-        s = default;
+        s = null;
     }
 
     public bool HasOutReturn(out string? s)
     {
-        s = default;
-        return default;
+        s = null;
+        return false;
     }
 }
 

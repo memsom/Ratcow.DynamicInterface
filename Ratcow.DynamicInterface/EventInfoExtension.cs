@@ -7,7 +7,7 @@ public static class EventInfoExtension
         if (!type.IsInterface)
             return type.GetEvents();
 
-        return (new Type[] { type })
+        return (new[] { type })
             .Concat(type.GetInterfaces())
             .SelectMany(i => i.GetEvents());
     }

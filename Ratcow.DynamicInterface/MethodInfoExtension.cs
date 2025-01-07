@@ -7,7 +7,7 @@ public static class MethodInfoExtension
         if (!type.IsInterface)
             return type.GetMethods();
 
-        return (new Type[] { type })
+        return (new[] { type })
             .Concat(type.GetInterfaces())
             .SelectMany(i => i.GetMethods());
     }

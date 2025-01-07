@@ -18,8 +18,8 @@ public abstract class V1Mapper : BaseMapper
     protected override void AddConstructor(TypeBuilder typeBuilder, FieldBuilder[] fields)
     {
         var paramList = fields.Select(f => f.FieldType).ToArray();
-        var type = Type.GetType("System.Object");
-        var ctor = type.GetConstructor(Array.Empty<Type>());
+        var type = Type.GetType("System.Object") ?? throw new EngineException("Could not find System.Object");
+        var ctor = type.GetConstructor([]);
 
         var constructorBuilder = typeBuilder.DefineConstructor(
             MethodAttributes.Public,
@@ -69,7 +69,8 @@ public abstract class V1Mapper : BaseMapper
         var propertyBuilder = typeBuilder.DefineProperty(propertyInfo.Name, PropertyAttributes.None, propertyInfo.PropertyType, null);
 
         //get the property info for the property
-        var instancePropertyInfo = instance.Implementor.GetType().GetProperty(instance.InstanceName);
+        var instancePropertyInfo = instance.Implementor.GetType().GetProperty(instance.InstanceName) ?? throw new EngineException("Could not find instance named " + instance.InstanceName);
+
         var instancePropertyGetter = instancePropertyInfo.GetGetMethod();
         var instancePropertySetter = instancePropertyInfo.GetSetMethod();
 
@@ -93,7 +94,7 @@ public abstract class V1Mapper : BaseMapper
             $"set_{propertyInfo.Name}",
             MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual,
             null,
-            new Type[] { propertyInfo.PropertyType });
+            [propertyInfo.PropertyType]);
 
         var setMethodIl = setMethod.GetILGenerator();
         setMethodIl.Emit(OpCodes.Ldarg_0);
@@ -141,7 +142,7 @@ public abstract class V1Mapper : BaseMapper
         var returnInfo = method.ReturnParameter;
         var parameterInfo = method.GetParameters();
 
-        if (returnInfo?.ParameterType != typeof(void))
+        if (returnInfo is not null && returnInfo.ParameterType != typeof(void))
         {
             if (parameterInfo is { Length: > 0 })
             {
@@ -282,15 +283,15 @@ public abstract class V1Mapper : BaseMapper
 
         var instanceMethodInfo = instance.Implementor?.GetType()?.GetMethod(instance.ImplementorName);
 
-        // IL_0000: nop
-        // IL_0001: ldarg.0      // this
-        // IL_0002: ldfld        class ModelImplementation.Model ModelImplementation.Harness::model
-        // IL_0007: ldarg.1      // s
-        // IL_0008: callvirt     instance bool ModelImplementation.Model::HasOutReturn(string&)
-        // IL_000d: stloc.0      // V_0
-        // IL_000e: br.s         IL_0010
-        // IL_0010: ldloc.0      // V_0
-        // IL_0011: ret
+        //// IL_0000: nop
+        //// IL_0001: ldarg.0      // this
+        //// IL_0002: ldfld        class ModelImplementation.Model ModelImplementation.Harness::model
+        //// IL_0007: ldarg.1      // s
+        //// IL_0008: callvirt     instance bool ModelImplementation.Model::HasOutReturn(string&)
+        //// IL_000d: stloc.0      // V_0
+        //// IL_000e: br.s         IL_0010
+        //// IL_0010: ldloc.0      // V_0
+        //// IL_0011: ret
 
         var methodIl = method.GetILGenerator();
         methodIl.Emit(OpCodes.Ldarg_0);
@@ -350,7 +351,7 @@ public abstract class V1Mapper : BaseMapper
             $"add_{eventInfo.Name}",
             MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.Final | MethodAttributes.SpecialName,
             null,
-            new Type[] { eventInfo.EventHandlerType });
+            [eventInfo.EventHandlerType]);
 
         // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         addMethodBuilder.SetImplementationFlags(MethodImplAttributes.Managed | MethodImplAttributes.Synchronized);
@@ -370,7 +371,7 @@ public abstract class V1Mapper : BaseMapper
             $"remove_{eventInfo.Name}",
             MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.Final | MethodAttributes.SpecialName,
             null,
-            new Type[] { eventInfo.EventHandlerType });
+            [eventInfo.EventHandlerType]);
 
         // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         removeMethodBuilder.SetImplementationFlags(MethodImplAttributes.Managed | MethodImplAttributes.Synchronized);

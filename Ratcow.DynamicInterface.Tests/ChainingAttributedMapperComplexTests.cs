@@ -1,18 +1,13 @@
-using Ratcow.DynamicInterface.Tests.Data;
-using Ratcow.DynamicInterface.Tests.Data.Interfaces;
-using Ratcow.DynamicInterface.Tests.Support;
-
 namespace Ratcow.DynamicInterface.Tests;
 
-[TestFixture]
 public class ChainingAttributedMapperComplexTests: BaseTest
 {
-    [Test]
+    [Fact]
     public void ChainingAttributedMapper_ComplexExample()
     {
         var engine = new ChainingAttributedMapper();
 
-        Assert.IsNotNull(engine, "Engine can not be null");
+        Assert.NotNull(engine);
 
         var detour = new ComplexExample();
         var fallback = new ComplexExampleEx();
@@ -24,7 +19,7 @@ public class ChainingAttributedMapperComplexTests: BaseTest
 
         var resultant = engine.CreateInstance<IComplexExampleEx>(detour, fallback);
 
-        Assert.IsNotNull(resultant);
+        Assert.NotNull(resultant);
 
         resultant.Simple0();
         resultant.Simple1(10);

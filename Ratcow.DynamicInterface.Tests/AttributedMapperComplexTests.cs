@@ -1,18 +1,13 @@
-using Ratcow.DynamicInterface.Tests.Data;
-using Ratcow.DynamicInterface.Tests.Data.Interfaces;
-using Ratcow.DynamicInterface.Tests.Support;
-
 namespace Ratcow.DynamicInterface.Tests;
 
-[TestFixture]
 public class AttributedMapperComplexTests: BaseTest
 {
-    [Test]
+    [Fact]
     public void AttributedMapper_ComplexExample()
     {
         var engine = new AttributedMapper();
 
-        Assert.IsNotNull(engine, "Engine can not be null");
+        Assert.NotNull(engine);
 
         var instance = new ComplexExample();
 
@@ -22,7 +17,7 @@ public class AttributedMapperComplexTests: BaseTest
 
         var resultant = engine.CreateInstance<IComplexExample>(instance);
 
-        Assert.IsNotNull(resultant);
+        Assert.NotNull(resultant);
 
         resultant.Simple0();
         resultant.Simple1(10);

@@ -10,7 +10,7 @@ public class ChainingAttributedMapper : V1Mapper
         var interfaceType = typeof(T);
         if (interfaceType.IsInterface && instances is [{} detour, {}  fallback])
         {
-            var baseName = interfaceType.Name.Substring(1);
+            var baseName = interfaceType.Name[1..];
 
             var fallbackType = fallback.GetType();
             
@@ -48,7 +48,7 @@ public class ChainingAttributedMapper : V1Mapper
                 var methodInstance = methodData.FirstOrDefault(p => p.Name == method.Name);
                 if (methodInstance.Implementor != null)
                 {
-                    var field = fieldData.FirstOrDefault(f => f.Name == methodInstance.Implementor.GetType().Name.ToLower());
+                    var field = fieldData.FirstOrDefault(f => f.Name == methodInstance.Implementor.GetType().Name.ToLower()) ?? throw new EngineException("Implementor not found");
                     AddMethod(dynamicType, method, methodInstance, field);
                 }
             }
@@ -59,7 +59,7 @@ public class ChainingAttributedMapper : V1Mapper
                 var propertyInstance = propertyData.FirstOrDefault(p => p.Name == property.Name);
                 if (propertyInstance.Implementor != null)
                 {
-                    var field = fieldData.FirstOrDefault(f => f.Name == propertyInstance.Implementor.GetType().Name.ToLower());
+                    var field = fieldData.FirstOrDefault(f => f.Name == propertyInstance.Implementor.GetType().Name.ToLower())?? throw new EngineException("Implementor not found");
                     AddProperty(dynamicType, property, propertyInstance, field);
                 }
             }
@@ -70,7 +70,7 @@ public class ChainingAttributedMapper : V1Mapper
                 var eventInstance = eventData.FirstOrDefault(p => p.Name == @event.Name);
                 if (eventInstance.Implementor != null)
                 {
-                    var field = fieldData.FirstOrDefault(f => f.Name == eventInstance.Implementor.GetType().Name.ToLower());
+                    var field = fieldData.FirstOrDefault(f => f.Name == eventInstance.Implementor.GetType().Name.ToLower())?? throw new EngineException("Implementor not found");
                     AddEvent(dynamicType, @event, eventInstance, field);
                 }
             }
@@ -84,9 +84,9 @@ public class ChainingAttributedMapper : V1Mapper
     }
 
     public T CreateInstance<T>(object detour, object fallback) => 
-        (T)Activator.CreateInstance(CreateType<T>(detour, fallback), detour, fallback);
+        (T)Activator.CreateInstance(CreateType<T>(detour, fallback)?? throw new EngineException("Type could not be created"), detour, fallback);
 
-    protected override T CreateInstanceImplementation<T>(params object[] instances) => throw new NotImplementedException();
+    protected override T CreateInstanceImplementation<T>(params object[] instances) => throw new EngineException();
 
     /// <summary>
     /// Gets the method to type mapping

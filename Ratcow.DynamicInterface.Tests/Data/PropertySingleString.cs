@@ -1,6 +1,4 @@
-﻿using Ratcow.DynamicInterface.Tests.Data.Interfaces;
-
-namespace Ratcow.DynamicInterface.Tests.Data;
+﻿namespace Ratcow.DynamicInterface.Tests.Data;
 
 public class PropertySingleString
 {
